@@ -1,0 +1,280 @@
+package Game1024;
+
+import java.util.*;
+
+/************************************
+ * This class is implemented by the 
+ * number slider interface and takes 
+ * on all of the methods. This class 
+ * is the building blocks of the game
+ * its known as the game engine 
+ ************************************/
+public class NumberGame implements NumberSlider {
+	/** A private int for the goal value */
+	private int GOAL_VALUE;
+	
+	/** private int grid*/
+	private int [][] grid;
+	/** Array list of cells */
+	private ArrayList<Cell> cells;
+	/** Random Number Generator */
+	private Random rdm;
+	/** GameStatus status*/
+	private GameStatus gameStatus, gameOver;
+
+	@Override
+	/************************************
+	 * Method that resizes the board 
+	 *@param height, width, winningValue
+	 ************************************/
+	public void resizeBoard(int height, int width, int winningValue) {
+
+		grid = new int[height][width];
+		cells = new ArrayList<Cell>();
+		rdm = new Random();
+		GOAL_VALUE = winningValue;
+		gameStatus = GameStatus.IN_PROGRESS;
+		gameOver = GameStatus.USER_LOST;
+
+	}
+
+	@Override
+	/************************************
+	 * MEthod that resets the board back to 
+	 * Two values of 2
+	 ************************************/
+	public void reset() {
+		for(int r = 0; r < grid.length; r++)
+			for (int c = 0; c < grid[0].length; c++)
+				grid[r][c] = 0;
+		grid[0][2] = 2;
+		grid[1][0] = 2;
+
+	}
+
+	@Override
+	/************************************
+	 * Method that sets the value of the 
+	 * array
+	 *
+	 ************************************/
+	public void setValues(int[][] ref) {
+		for(int r = 0; r < grid.length; r++)
+			for (int c = 0; c < grid[0].length; c++)
+				grid[r][c] = ref[r][c];
+
+	}
+
+	@Override
+	/************************************
+	 * Method that places a random value
+	 * on a empty tile
+	 *@return Cell
+	 ************************************/
+	public Cell placeRandomValue() {
+
+		int r = rdm.nextInt(grid.length);
+		int c = rdm.nextInt(grid[0].length);
+		while (grid[r][c] != 0){
+			r = rdm.nextInt(grid.length);
+			c= rdm.nextInt(grid[0].length);
+		}
+
+		Cell cell = new Cell();
+		cell.row = r;
+		cell.column = c;
+		cell.value = 2;
+		grid[r][c] = 2;
+		return cell;
+	
+	}
+
+	@Override
+	/************************************
+	 * Method that does a slide direction 
+	 *@param dir
+	 *@return true, false
+	 ************************************/
+	public boolean slide(SlideDirection dir) {
+
+		switch(dir){
+		case UP:
+			
+			
+			for (int c = 0; c < grid[0].length; c++) {
+				ArrayList list = new ArrayList();
+				for (int r = 0; r < grid.length; r++) {
+					if (grid[r][c] != 0)
+						list.add(grid[r][c]);
+				}
+
+				ArrayList list2 = new ArrayList();
+				list.add(0);
+				for (int i = 0; i < list.size() - 1; i++) 
+					if (list.get(i) == list.get(i + 1)) {
+						list2.add((int)list.get(i) + (int)list.get(i + 1));
+						i++;
+					}
+					else
+						list2.add (list.get(i));
+
+				for (int i = 0; i < grid.length; i++)
+					grid [i][c] = 0;
+
+				for (int i = 0; i < list2.size(); i++)
+					grid [i][c] = (int)list2.get(i);
+				
+			}
+			
+			placeRandomValue();	
+			return true;
+			
+			
+			
+
+		case DOWN:
+			int n = grid.length - 1; 
+			for (int c = 0; c < grid.length; c++) {
+				ArrayList list = new ArrayList();
+				for (int r = n; r >= 0 ; r--) {
+					if (grid[r][c] != 0)
+						list.add(grid[r][c]);
+				}
+
+				ArrayList list2 = new ArrayList();
+				list.add(0);
+				for (int i = 0; i < list.size() -1 ; i++) 
+
+					if (list.get(i + 1 ) == list.get(i)) {
+						list2.add((int)list.get(i) + (int)list.get(i + 1 ));
+						i++;
+					}
+					else
+						list2.add (list.get(i));
+
+				for (int i = 0; i < grid.length; i++)
+					grid[i][c] = 0;
+
+				for (int i = 0; i < list2.size(); i++)
+					grid[grid.length-1 - i][c] = (int)list2.get(i);
+			}
+
+			placeRandomValue();
+			return true;
+
+
+
+		case LEFT:
+			for (int r = 0; r < grid.length; r++) {
+				ArrayList list = new ArrayList();
+				for (int c = 0; c < grid[0].length; c++) {
+					if (grid[r][c] != 0)
+						list.add(grid[r][c]);
+				}
+
+				ArrayList list2 = new ArrayList();
+				list.add(0);
+				for (int i = 0; i < list.size() - 1; i++) 
+					if (list.get(i) == list.get(i + 1)) {
+						list2.add((int)list.get(i) + (int)list.get(i + 1));
+						i++;
+					}
+					else
+						list2.add (list.get(i));
+
+				for (int i = 0; i < grid.length; i++)
+					grid [r][i] = 0;
+
+				for (int i = 0; i < list2.size(); i++)
+					grid [r][i] = (int)list2.get(i);
+
+			}
+			placeRandomValue();	
+			return true;
+			
+
+
+		case RIGHT:
+			int k = grid.length-1;
+			for (int r = 0; r < grid.length; r++) {
+				ArrayList list = new ArrayList();
+				for (int c = k; c >= 0; c--) {
+					if (grid[r][c] != 0)
+						list.add(grid[r][c]);
+				}
+
+				ArrayList list2 = new ArrayList();
+				list.add(0);
+				for (int i = 0; i < list.size() - 1; i++) 
+					if (list.get(i) == list.get(i + 1)) {
+						list2.add((int)list.get(i) + (int)list.get(i + 1));
+						i++;
+					}
+					else
+						list2.add (list.get(i));
+
+				for (int i = 0; i < grid.length; i++)
+					grid [r][i] = 0;
+
+				for (int i = 0; i < list2.size(); i++)
+					grid [r][grid.length-1-i] = (int)list2.get(i);
+
+			}
+			placeRandomValue();	
+			return true;
+
+		default:
+		
+			
+
+		}
+		return false;
+	}
+
+	@Override
+	/************************************
+	 * Method that finds the none empty 
+	 * tiles and assigns a cell to them
+	 *
+	 *@return cells
+	 ************************************/
+	public ArrayList<Cell> getNonEmptyTiles() {
+		
+		cells = new ArrayList<Cell>();
+		
+		for(int r = 0; r < grid.length; r++)
+			for (int c = 0; c < grid[r].length; c++)
+				if(grid[r][c]  != 0){
+					Cell newcell = new Cell();
+					newcell.column = c;
+					newcell.row = r;
+					newcell.value = grid[r][c];
+					cells.add(newcell);
+
+				}
+		return cells;
+
+	}
+
+	@Override
+	/************************************
+	 * Method that returns what is the
+	 * current status
+	 *
+	 *@return gameStatus
+	 ************************************/
+	public GameStatus getStatus() {
+		
+		return gameStatus;
+
+	}
+
+	@Override
+	/***************************************
+	 *The method that undoes the last move
+	 ***************************************/
+	public void undo() {
+
+	}
+
+}
